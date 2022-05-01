@@ -6,28 +6,14 @@ import scala.io.Source
 
 
 object Top500SongsFileReader {
-  def apply(): List[Top500SongsObject.Song] = {
+  def apply():Iterator[Array[String]] = {
     Source
-      .fromFile(new File("src/public/top500Songs.csv"))
-      .getLines
-      .drop(1) // drop header (first line)
-      .map(raw ⇒ raw.split(";"))
-      .map(raw ⇒
-        raw
-          .zipWithIndex
-          .map {
-            case (col, ind) ⇒
+      .fromFile(new File("src/public/top500Songs.csv")).getLines.drop(1) // drop header (first line)
+      .map(raw ⇒ raw.split(";")).map(raw ⇒
+        raw.zipWithIndex.map { case (col, ind) ⇒
               format(ind)(col)
-
           }
       )
-      .map(raw ⇒ Top500SongsObject.Song(title = raw(0), description = raw(1), appearsOn = raw(2), artist = raw(3), writers = raw(4), producer = raw(5),
-        released = raw(6),
-        streak = raw(7),
-        position = raw(8)))
-      .toSet
-      .toList
-
   }
 
   val format:Int ⇒ String ⇒ String = new Function1[Int, Function1[String, String]] {
