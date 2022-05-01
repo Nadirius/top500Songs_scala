@@ -5,7 +5,7 @@ object Top500SongsObject {
   trait Displayable {
     def display(): Unit
   }
-  case class Song(title:String, description:String, appearsOn : String, artist: String, writers:String, producer:String, released:Any, streak:Any, position:Any)
+  case class Song(title:String, description:String, appearsOn : String, artist: String, writers:String, producer:String, released:String, streak:String, position:String)
   extends Displayable {
     def display() : Unit = println(
       s"""

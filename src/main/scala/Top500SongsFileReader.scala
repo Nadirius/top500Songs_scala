@@ -62,16 +62,20 @@ object Top500SongsFileReader {
     }
   }
 
-  val encodingCorrections: (String ⇒ String) = (data: String) => data
-    .replace("â€™", "'")
-    .replace("â€”", "-")
-    .replace("â€¦", "…")
-    .replace("â€œ", "“")
-    .replace("â€”", "—")
-    .replace("â€“", "–")
-    .replace("â€˜", "‘")
-    .replaceAll("â€.", "")
-    .replaceAll("\"\"+", "\"")
+  val encodingCorrections: (String ⇒ String) = new Function1[String, String] {
+    override def apply(data: String): String =
+      data
+        .replace("â€™", "'")
+        .replace("â€”", "-")
+        .replace("â€¦", "…")
+        .replace("â€œ", "“")
+        .replace("â€”", "—")
+        .replace("â€“", "–")
+        .replace("â€˜", "‘")
+        .replaceAll("â€.", "")
+        .replaceAll("\"\"+", "\"")
+
+  }
 
   val datePatternCorrections: String ⇒ String = new Function1[String, String] {
     override def apply(data: String): String = {
