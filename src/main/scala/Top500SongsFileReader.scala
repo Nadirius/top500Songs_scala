@@ -58,6 +58,10 @@ object Top500SongsFileReader {
         .replace("â€”", "—")
         .replace("â€“", "–")
         .replace("â€˜", "‘")
+        .replace("Ã–", "Ö")
+        .replace("Ã¶", "ö")
+        .replace("Ã¨", "è")
+        .replace("Ã©", "é")
         .replaceAll("â€.", "")
         .replaceAll("\"\"+", "\"")
 
@@ -84,7 +88,7 @@ object Top500SongsFileReader {
 
   val streakCorrections:String ⇒ String = new Function1[String, String] {
     override def apply(data: String): String = {
-      if (data.trim() != "none" && data.trim() != "Non-Single" && data.trim() != "Did not chart" && data.trim() != "Non-single in the U.S." && data.trim() != "Non-single in U.S." && data.trim() != "Predates chart" && data.trim() != "Predates pop charts") {
+      if (data.trim() != "none" && data.trim() != "Non-Single" && data.trim() != "Did not chart" && data.trim() != "Non-single in the U.S." && data.trim() != "Non-single in U.S." && data.trim() != "Predates chart" && data.trim() != "Predates pop charts" && data.trim() != "Did Not Chart") {
         data
           .trim()
           .split(" ")(0)
