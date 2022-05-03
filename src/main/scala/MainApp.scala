@@ -69,26 +69,31 @@ object MainApp extends App {
   println()
 
   unclassifiedDf.printSchema()
-  unclassifiedDf.show(Int.MaxValue, 25)
+
 
   classifiedDf.printSchema()
-  classifiedDf.show(Int.MaxValue, 25)
-
-  classifiedDf.sort($"position",$"streak".desc).show(Int.MaxValue, 40)
 
 
   AppMenu.displayMenu()
 
   var userInputMenu = 1000
 
-  def handleUserInput(userInputMenu: Int) = {
-    case 1 ⇒  classifiedDf.sort($"position",$"streak".desc).show(Int.MaxValue, 40)
-    case 2 ⇒ classifiedDf
+  def searchByTitle() = {
+    print("Enter title name :")
+    scala.io.StdIn.readInt()
+  }
+
+  def handleUserInput(userInputMenu: Int, args : String*): Unit = userInputMenu match {
+    case 1 ⇒ classifiedDf.sort($"position",$"streak".desc).show(Int.MaxValue, 40)
+    case 2 ⇒ classifiedDf.sort($"released").show(Int.MaxValue, 40)
+    case 3 ⇒ unclassifiedDf.show(Int.MaxValue,40)
+    case _ ⇒ ""
   }
 
   while(userInputMenu != 0) {
     userInputMenu = scala.io.StdIn.readInt()
     handleUserInput(userInputMenu)
+    AppMenu.displayMenu()
   }
 
   sys.exit(0)

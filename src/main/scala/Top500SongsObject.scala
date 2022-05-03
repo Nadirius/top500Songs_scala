@@ -7,6 +7,7 @@ object Top500SongsObject {
   trait Displayable {
     def display(): Unit
   }
+
   case class Song(title:String, description:String, appearsOn : String, artist: String, writers:String, producer:String, released:LocalDate)
 
   class Classified(override val title:String, override val description:String, override val appearsOn : String, override val artist: String, override val writers:String, override val producer:String, override val released:LocalDate, streak:String, position:String) extends Song(title:String, description:String, appearsOn : String, artist: String, writers:String, producer:String, released:LocalDate) with Displayable
