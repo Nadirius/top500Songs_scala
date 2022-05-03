@@ -6,28 +6,14 @@ import scala.io.Source
 
 
 object Top500SongsFileReader {
-  def apply(): List[Top500SongsObject.Song] = {
+  def apply():Iterator[Array[String]] = {
     Source
-      .fromFile(new File("src/public/top500Songs.csv"))
-      .getLines
-      .drop(1) // drop header (first line)
-      .map(raw ⇒ raw.split(";"))
-      .map(raw ⇒
-        raw
-          .zipWithIndex
-          .map {
-            case (col, ind) ⇒
+      .fromFile(new File("src/public/top500Songs.csv")).getLines.drop(1) // drop header (first line)
+      .map(raw ⇒ raw.split(";")).map(raw ⇒
+        raw.zipWithIndex.map { case (col, ind) ⇒
               format(ind)(col)
-
           }
       )
-      .map(raw ⇒ Top500SongsObject.Song(title = raw(0), description = raw(1), appearsOn = raw(2), artist = raw(3), writers = raw(4), producer = raw(5),
-        released = raw(6),
-        streak = raw(7),
-        position = raw(8)))
-      .toSet
-      .toList
-
   }
 
   val format:Int ⇒ String ⇒ String = new Function1[Int, Function1[String, String]] {
@@ -62,16 +48,24 @@ object Top500SongsFileReader {
     }
   }
 
-  val encodingCorrections: (String ⇒ String) = (data: String) => data
-    .replace("â€™", "'")
-    .replace("â€”", "-")
-    .replace("â€¦", "…")
-    .replace("â€œ", "“")
-    .replace("â€”", "—")
-    .replace("â€“", "–")
-    .replace("â€˜", "‘")
-    .replaceAll("â€.", "")
-    .replaceAll("\"\"+", "\"")
+  val encodingCorrections: (String ⇒ String) = new Function1[String, String] {
+    override def apply(data: String): String =
+      data
+        .replace("â€™", "'")
+        .replace("â€”", "-")
+        .replace("â€¦", "…")
+        .replace("â€œ", "“")
+        .replace("â€”", "—")
+        .replace("â€“", "–")
+        .replace("â€˜", "‘")
+        .replace("Ã–", "Ö")
+        .replace("Ã¶", "ö")
+        .replace("Ã¨", "è")
+        .replace("Ã©", "é")
+        .replaceAll("â€.", "")
+        .replaceAll("\"\"+", "\"")
+
+  }
 
   val datePatternCorrections: String ⇒ String = new Function1[String, String] {
     override def apply(data: String): String = {
@@ -94,7 +88,7 @@ object Top500SongsFileReader {
 
   val streakCorrections:String ⇒ String = new Function1[String, String] {
     override def apply(data: String): String = {
-      if (data.trim() != "none" && data.trim() != "Non-Single" && data.trim() != "Did not chart" && data.trim() != "Non-single in the U.S." && data.trim() != "Non-single in U.S." && data.trim() != "Predates chart" && data.trim() != "Predates pop charts") {
+      if (data.trim() != "none" && data.trim() != "Non-Single" && data.trim() != "Did not chart" && data.trim() != "Non-single in the U.S." && data.trim() != "Non-single in U.S." && data.trim() != "Predates chart" && data.trim() != "Predates pop charts" && data.trim() != "Did Not Chart") {
         data
           .trim()
           .split(" ")(0)
