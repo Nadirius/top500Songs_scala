@@ -7,7 +7,7 @@ import scala.io.Source
 
 object Top500SongsFileReader {
   def apply():Iterator[Array[String]] = {
-    Source
+Source
       .fromFile(new File("src/public/top500Songs.csv")).getLines.drop(1) // drop header (first line)
       .map(raw ⇒ raw.split(";")).map(raw ⇒
         raw.zipWithIndex.map { case (col, ind) ⇒
@@ -51,6 +51,7 @@ object Top500SongsFileReader {
   val encodingCorrections: (String ⇒ String) = new Function1[String, String] {
     override def apply(data: String): String =
       data
+        .trim()
         .replace("â€™", "'")
         .replace("â€”", "-")
         .replace("â€¦", "…")
