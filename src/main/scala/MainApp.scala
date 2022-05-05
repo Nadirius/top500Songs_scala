@@ -1,13 +1,20 @@
+import Top500SongsObject.{Classified, Song, UnClassified}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql
 import org.apache.spark.sql.SparkSession
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
 
 import scala.concurrent.Future
-
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 object MainApp extends App {
+  //Disable spark logs
+  Logger.getLogger("org").setLevel(Level.OFF)
+  Logger.getLogger("akka").setLevel(Level.OFF)
+
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
 
   var classifiedFlag: Boolean = true
@@ -66,37 +73,56 @@ object MainApp extends App {
   while (classifiedFlag || unclassifiedFlag) {
     Thread.sleep(200)
   }
-  println()
 
+  println("\n Unclassified songs tree")
   unclassifiedDf.printSchema()
 
-
+  println("\n classified songs tree")
   classifiedDf.printSchema()
+  println()
 
 
-  AppMenu.displayMenu()
+  def showSongBytitle() =  {
+    print("Please provide a song title : ")
+    val title = scala.io.StdIn.readLine()
+    classifiedDf
+      .filter(raw ⇒ raw(0).toString.toLowerCase.contains(title.toLowerCase()))
+      .map(raw ⇒ new Classified(raw(0).toString,raw(1).toString,raw(2).toString,raw(3).toString,raw(4).toString,raw(5).toString, raw(6).toString.substring(0,7),raw(7).toString,raw(8).toString)).foreach(_.display)
+    unclassifiedDf
+      .filter(raw ⇒ raw(0).toString.toLowerCase.contains(title.toLowerCase()))
+      .map(raw ⇒ new UnClassified(raw(0).toString,raw(1).toString,raw(2).toString,raw(3).toString,raw(4).toString,raw(5).toString, raw(6).toString.substring(0,7),raw(7).toString)).foreach(_.display)
 
-  var userInputMenu = 1000
-
-  def searchByTitle() = {
-    print("Enter title name :")
-    scala.io.StdIn.readInt()
   }
 
-  def handleUserInput(userInputMenu: Int, args : String*): Unit = userInputMenu match {
+  def showSongsByWriter() = {
+  print("Please provide a writer : ")
+    val writer = scala.io.StdIn.readLine()
+  classifiedDf
+    .filter(raw ⇒ raw(4).toString.toLowerCase.contains(writer.toLowerCase()))
+    .map(raw ⇒ new Classified(raw(0).toString,raw(1).toString,raw(2).toString,raw(3).toString,raw(4).toString,raw(5).toString, raw(6).toString.substring(0,7),raw(7).toString,raw(8).toString)).foreach(_.display)
+  unclassifiedDf
+    .filter(raw ⇒ raw(4).toString.toLowerCase.contains(writer.toLowerCase()))
+    .map(raw ⇒ new UnClassified(raw(0).toString,raw(1).toString,raw(2).toString,raw(3).toString,raw(4).toString,raw(5).toString, raw(6).toString.substring(0,7),raw(7).toString)).foreach(_.display)
+
+  }
+
+  def handleUserInput(userInputMenu: Int): Unit = userInputMenu match {
     case 1 ⇒ classifiedDf.sort($"position",$"streak".desc).show(Int.MaxValue, 40)
     case 2 ⇒ classifiedDf.sort($"released").show(Int.MaxValue, 40)
     case 3 ⇒ unclassifiedDf.show(Int.MaxValue,40)
+    case 4 ⇒ showSongBytitle()
+    case 5 ⇒ showSongsByWriter()
+    case 0 ⇒  sys.exit(0)
     case _ ⇒ ""
   }
 
-  while(userInputMenu != 0) {
-    userInputMenu = scala.io.StdIn.readInt()
-    handleUserInput(userInputMenu)
-    AppMenu.displayMenu()
-  }
 
-  sys.exit(0)
+  do{
+    AppMenu.displayMenu()
+    handleUserInput( scala.io.StdIn.readInt())
+  } while(true)
+
+
 
 
 }
